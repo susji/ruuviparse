@@ -3,6 +3,13 @@
 This program parses Ruuvi packets (RAWv2) from standard input and prints their
 payload as JSON to standard output.
 
+# Installing
+
+Get a ready [release](https://github.com/susji/ruuviparse/releases) or use the
+Go toolchain like this:
+
+    $ go install github.com/susji/ruuviparse@latest
+
 # How to use
 
 Let us assume that you have a fleet of Ruuvi sensors and you would like to dump
@@ -18,6 +25,8 @@ broker. Further, let us assume that
     Data in `ad` like this, and
   - the manufacturer-specific data is as described in [the Ruuvi
     documentation](https://docs.ruuvi.com/communication/bluetooth-advertisements).
+- you have a suitable MQTT client installed
+  - the example below uses `mosquitto_sub`
 
 Your data shape would be something like this:
 
