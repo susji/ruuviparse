@@ -39,10 +39,6 @@ func main() {
 	s := bufio.NewScanner(os.Stdin)
 	fmt.Fprintln(os.Stderr, "reading standard input as", mode)
 	for s.Scan() {
-		if err := s.Err(); err != nil {
-			fmt.Fprintln(os.Stderr, "reading input failed:", err)
-			continue // Maybe depart?
-		}
 		d, err := dec(s.Bytes())
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "decoding input failed:", err)
@@ -59,5 +55,8 @@ func main() {
 			continue
 		}
 		fmt.Println(string(out))
+	}
+	if err := s.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "reading input failed:", err)
 	}
 }
