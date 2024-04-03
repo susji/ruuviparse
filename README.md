@@ -20,6 +20,7 @@ to `ruuviparse`:
 
 <details>
     <summary>View output</summary>
+
 ```json
 {
   "Type": 5,
@@ -67,6 +68,7 @@ to `ruuviparse`:
   "MAC": "cb:b8:33:4c:88:4f"
 }
 ```
+
 </details>
 
 # Integrating with MQTT messaging
