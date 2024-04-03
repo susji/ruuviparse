@@ -46,8 +46,10 @@ Your data shape would be something like this:
 ```
 
 The Ruuvi RAWv2 Payload begins at `05` above, so from 7th octet which is index
-14 in the hex-encoded string. To parse and pretty-print the temperature values,
-you can do something like this:
+14 in the hex-encoded string. We can also pick Ruuvi messages by filtering with
+`ff9904` which means manufacturer-specific data and Ruuvi's unique identifier.
+To parse and pretty-print the temperature values, you can do something like
+this:
 
 ```
 $ mosquitto_sub \
