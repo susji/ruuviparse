@@ -16,7 +16,7 @@ We can feed Ruuvi's [test
 vectors](https://docs.ruuvi.com/communication/bluetooth-advertisements/data-format-5-rawv2#test-vectors)
 to `ruuviparse`:
 
-    $ echo '0512FC5394C37C0004FFFC040CAC364200CDCBB8334C884F' | ruuviparse
+    $ echo '0512FC5394C37C0004FFFC040CAC364200CDCBB8334C884F' | ruuviparse | jq
 
 <details>
     <summary>View output</summary>
