@@ -126,3 +126,6 @@ $ mosquitto_sub \
       | jq --raw-output --compact-output \
             'select(.Temperature.Valid) | [.Timestamp, .MAC, .Temperature.Value] | @tsv'
 ```
+
+For an example how to insert the data into a database, see the documentation for
+[ruuviscan](https://github.com/susji/ruuviscan?tab=readme-ov-file#storing-temperature-values-in-an-sqlite-database).
