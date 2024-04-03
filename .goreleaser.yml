@@ -1,0 +1,23 @@
+builds:
+- id: ruuviparse
+  binary: ruuviparse
+  env:
+    - CGO_ENABLED=0
+  goos:
+    - linux
+    - windows
+    - darwin
+    - freebsd
+    - openbsd
+  goarch:
+    - amd64
+    - arm64
+    - arm
+  mod_timestamp: "{{ .CommitTimestamp }}"
+  flags:
+    - -trimpath
+  ldflags:
+    - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }}
+checksum:
+  algorithm: sha256
+  name_template: "checksums.txt"
