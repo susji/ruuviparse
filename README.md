@@ -10,7 +10,66 @@ Go toolchain like this:
 
     $ go install github.com/susji/ruuviparse@latest
 
-# How to use
+# Simple example
+
+We can feed Ruuvi's [test
+vectors](https://docs.ruuvi.com/communication/bluetooth-advertisements/data-format-5-rawv2#test-vectors)
+to `ruuviparse`:
+
+    $ echo '0512FC5394C37C0004FFFC040CAC364200CDCBB8334C884F' | ruuviparse
+
+<details>
+    <summary>View output</summary>
+```json
+{
+  "Type": 5,
+  "Timestamp": "2024-04-04T00:20:22.201683+03:00",
+  "Temperature": {
+    "Valid": true,
+    "Value": 24.3
+  },
+  "Humidity": {
+    "Valid": true,
+    "Value": 53.489998
+  },
+  "Pressure": {
+    "Valid": true,
+    "Value": 100044
+  },
+  "AccelerationX": {
+    "Valid": true,
+    "Value": 4
+  },
+  "AccelerationY": {
+    "Valid": true,
+    "Value": -4
+  },
+  "AccelerationZ": {
+    "Valid": true,
+    "Value": 1036
+  },
+  "BatteryVoltage": {
+    "Valid": true,
+    "Value": 2.977
+  },
+  "TransmitPower": {
+    "Valid": true,
+    "Value": 4
+  },
+  "MovementCounter": {
+    "Valid": true,
+    "Value": 66
+  },
+  "SequenceNumber": {
+    "Valid": true,
+    "Value": 205
+  },
+  "MAC": "cb:b8:33:4c:88:4f"
+}
+```
+</details>
+
+# Integrating with MQTT messaging
 
 Let us assume that you have a fleet of Ruuvi sensors and you would like to dump
 their (valid) temperature readings as their data is somehow streamed into a MQTT
