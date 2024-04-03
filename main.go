@@ -32,7 +32,7 @@ func main() {
 			return base64.StdEncoding.AppendDecode([]byte{}, b)
 		}
 	default:
-		fmt.Fprintln(os.Stderr, "unknown mode:, mode")
+		fmt.Fprintln(os.Stderr, "unknown mode:", mode)
 		os.Exit(1)
 	}
 
