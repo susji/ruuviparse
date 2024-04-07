@@ -14,29 +14,32 @@ ACT="/bin/cp $HOME/ruuvimetrics/${F} /var/www/htdocs/metrics"
 # Due to fromdateiso8601.
 export TZ=UTC
 
+info() {
+  printf "%s\n" "$*" 1>&2
+}
+
 val() {
   _mac="$1"
   _kind="$2"
   _ok="$3"
   _val="$4"
-  _tmpf="$5"
-  echo "[$_mac] $_kind: $_val ($_ok)"
+  info "[$_mac] $_kind: $_val ($_ok)"
   _p="ruuvi_${_kind}"
   if [ "$_ok" = "true" ]; then
     # We have a new valid value so filter out the old one.
     _m="{mac=\"$_mac\"}"
-    cat "$F" | fgrep "${_p}{mac=" | fgrep -v "$_m"  > "$_tmpf"
-    echo "${_p}${_m} $_val $_ts" >> "$_tmpf"
+    cat "$F" | fgrep "${_p}{mac=" | fgrep -v "$_m"
+    echo "${_p}${_m} $_val $_ts"
   else
     # No new valid value so just copy all we have.
-    cat "$F" | fgrep "${_p}{mac=" > "$_tmpf"
+    cat "$F" | fgrep "${_p}{mac="
   fi
 }
 
 dump() {
   _kind="$1"
   _tmpf="$2"
-  { echo "# TYPE ruuvi_${_kind} gauge"; cat "$_tmpf"; } | sort >> "$F"
+  { echo "# TYPE ruuvi_${_kind} gauge"; cat "$_tmpf"; } | sort
 }
 
 activate() {
@@ -57,7 +60,6 @@ mosquitto_sub \
     '. + { "OriginalTimestamp": .Timestamp }
      | .Timestamp |= .[:index(".")] + "Z"
      | .Timestamp |= fromdateiso8601 * 1000
-     | . + {"CompareTimestamp": (.Timestamp / 1000 | todate) }
      | [.OriginalTimestamp,
         .Timestamp,
         .MAC,
@@ -69,18 +71,17 @@ mosquitto_sub \
         .MovementCounter.Value]
      | @tsv' \
   | while read -r _ots _ts _mac _vtemp _temp _vvolt _volt _vmove _move; do
-    echo "[$_mac] $_ots"
+    info "[$_mac] $_ots"
     _ttemp=$(mktemp)
     _tvolt=$(mktemp)
     _tmove=$(mktemp)
-    val "$_mac" "temperature" "$_vtemp" "$_temp" "$_ttemp"
-    val "$_mac" "voltage" "$_vvolt" "$_volt" "$_tvolt"
-    val "$_mac" "movement" "$_vmove" "$_move" "$_tmove"
-    rm -f "$F"
+    val "$_mac" "temperature" "$_vtemp" "$_temp" > "$_ttemp"
+    val "$_mac" "voltage" "$_vvolt" "$_volt" > "$_tvolt"
+    val "$_mac" "movement" "$_vmove" "$_move" > "$_tmove"
     echo "# Generated at $(date) by $(basename "$0")" > "$F"
-    dump "temperature" "$_ttemp"
-    dump "voltage" "$_tvolt"
-    dump "movement" "$_tmove"
+    dump "temperature" "$_ttemp" >> "$F"
+    dump "voltage" "$_tvolt" >> "$F"
+    dump "movement" "$_tmove" >> "$F"
     activate
     rm -f "$_ttemp" "$_tvolt" "$_tmove"
   done
