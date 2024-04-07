@@ -22,6 +22,7 @@ checksum:
   algorithm: sha256
   name_template: "checksums.txt"
 archives:
-  files:
-    - README.md
-    - scripts/*
+  - id: ruuviparse
+    files:
+      - README.md
+      - scripts/*
