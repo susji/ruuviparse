@@ -23,6 +23,7 @@ val() {
   _kind="$2"
   _ok="$3"
   _val="$4"
+  _ts="$5"
   info "[$_mac] $_kind: $_val ($_ok)"
   _p="ruuvi_${_kind}"
   if [ "$_ok" = "true" ]; then
@@ -70,18 +71,18 @@ mosquitto_sub \
         .MovementCounter.Valid,
         .MovementCounter.Value]
      | @tsv' \
-  | while read -r _ots _ts _mac _vtemp _temp _vvolt _volt _vmove _move; do
-    info "[$_mac] $_ots"
-    _ttemp=$(mktemp)
-    _tvolt=$(mktemp)
-    _tmove=$(mktemp)
-    val "$_mac" "temperature" "$_vtemp" "$_temp" > "$_ttemp"
-    val "$_mac" "voltage" "$_vvolt" "$_volt" > "$_tvolt"
-    val "$_mac" "movement" "$_vmove" "$_move" > "$_tmove"
+  | while read -r ots ts mac vtemp temp vvolt volt vmove move; do
+    info "[$mac] $ots"
+    ttemp=$(mktemp)
+    tvolt=$(mktemp)
+    tmove=$(mktemp)
+    val "$mac" "temperature" "$vtemp" "$temp" "$ts" > "$ttemp"
+    val "$mac" "voltage" "$vvolt" "$volt" "$ts" > "$tvolt"
+    val "$mac" "movement" "$vmove" "$move" "$ts" > "$tmove"
     echo "# Generated at $(date) by $(basename "$0")" > "$F"
-    dump "temperature" "$_ttemp" >> "$F"
-    dump "voltage" "$_tvolt" >> "$F"
-    dump "movement" "$_tmove" >> "$F"
+    dump "temperature" "$ttemp" >> "$F"
+    dump "voltage" "$tvolt" >> "$F"
+    dump "movement" "$tmove" >> "$F"
     activate
-    rm -f "$_ttemp" "$_tvolt" "$_tmove"
+    rm -f "$ttemp" "$tvolt" "$tmove"
   done
