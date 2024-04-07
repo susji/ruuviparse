@@ -129,3 +129,59 @@ $ mosquitto_sub \
 
 For an example how to insert the data into a database, see the documentation for
 [ruuviscan](https://github.com/susji/ruuviscan?tab=readme-ov-file#storing-temperature-values-in-an-sqlite-database).
+
+# Grabbing Ruuvi data from MQTT and exposing it as Prometheus metrics
+
+For a minimalistic example on how to expose Ruuvi values in Prometheus'
+[text-based exposition
+format](https://github.com/prometheus/docs/blob/main/content/docs/instrumenting/exposition_formats.md)
+see [scripts/ruuvimetrics.sh](scripts/ruuvimetrics.sh). The idea of the script
+is this: We will again use `mosquitto_sub` to obtain Ruuvi messages, parse and
+output them as JSON with `ruuviparse` and then generate a Prometheus-compatible
+metrics file of the sensor values. In addition to this script, you will probably
+need a way to serve the generated file over HTTP so Prometheus or a similar tool
+can periodically read its contents. After this, it's trivial to consume the
+sensor values with something like Grafana.
+
+In the script, you will want to modify the broker settings and the `ACT`
+variable to copy the generated metrics file to your intended `TARGETDIR`. The
+resulting file might look like something like this:
+
+```
+# Generated at Sun Apr  7 14:36:07 UTC 2024 by ruuvimetrics.sh
+# TYPE ruuvi_temperature gauge
+ruuvi_temperature{mac="aa:aa:aa:aa:aa:aa"} 5.185 1712500560000
+ruuvi_temperature{mac="bb:bb:bb:bb:bb:bb"} 2.615 1712500546000
+ruuvi_temperature{mac="cc:cc:cc:cc:cc:cc"} 2.865 1712500567000
+ruuvi_temperature{mac="dd:dd:dd:dd:dd:dd"} 22.289999 1712500567000
+# TYPE ruuvi_voltage gauge
+ruuvi_voltage{mac="aa:aa:aa:aa:aa:aa"} 2.929 1712500560000
+ruuvi_voltage{mac="bb:bb:bb:bb:bb:bb"} 2.865 1712500546000
+ruuvi_voltage{mac="cc:cc:cc:cc:cc:cc"} 2.943 1712500567000
+ruuvi_voltage{mac="dd:dd:dd:dd:dd:dd"} 3.038 1712500567000
+# TYPE ruuvi_movement gauge
+ruuvi_movement{mac="aa:aa:aa:aa:aa:aa"} 183 1712500560000
+ruuvi_movement{mac="bb:bb:bb:bb:bb:bb"} 125 1712500546000
+ruuvi_movement{mac="cc:cc:cc:cc:cc:cc"} 88 1712500567000
+ruuvi_movement{mac="dd:dd:dd:dd:dd:dd"} 154 1712500567000
+```
+
+For testing the idea, something like this will suffice to serve the resulting
+metrics file over HTTP:
+
+    $ cd $TARGETDIR && python3 -m http.server 9200 --bind 127.0.0.1
+
+If you think you need elevated privileges to run the script, you should instead
+modify your target directory privileges accordingly. For some error-tolerance,
+wrap the invocation in a loop like
+
+```sh
+while true; do
+    echo "begin $(date)"
+    ./ruuvimetrics.sh
+    echo exited
+    sleep 10
+done
+```
+
+or use some kind of a process manager.
